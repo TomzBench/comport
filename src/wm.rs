@@ -59,7 +59,10 @@ impl Drop for RegistrationHandle {
 pub enum RecepientHandle {
     /// The message recipient parameter is a window handle
     Window(Window) = DEVICE_NOTIFY_WINDOW_HANDLE,
+    #[allow(unused)]
     /// The message recipient parameter is a service handle
+    /// NOTE this eventually intended to support Service messages (instead of Window messages)
+    ///      when service support added we can remove the #[allow(unused)]
     Service(isize) = DEVICE_NOTIFY_SERVICE_HANDLE,
 }
 impl RecepientHandle {

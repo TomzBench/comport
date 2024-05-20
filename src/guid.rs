@@ -58,11 +58,6 @@ impl From<Guid> for windows_sys::core::GUID {
     }
 }
 
-/// Create a new Guid. Panics when an invalid uuid is provided
-pub fn new<O: Into<OsString>>(uuid: O) -> Guid {
-    Guid::new(uuid).expect("invalid uuid {uuid}")
-}
-
 /// Initializes a `GUID` from literal values.
 #[macro_export]
 macro_rules! guid {

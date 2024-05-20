@@ -1,0 +1,27 @@
+# autoconf
+*.cache
+
+# env secrets
+.env
+.venv
+
+# docs
+docs/_build
+
+# cmake
+compile_commands.json
+
+.west
+
+/build
+/.vscode
+*.DS_Store
+__pycache__
+build/
+node_modules/
+
+# cargo
+/target
+**/*/target
+**/*.rs.bk
+**/*/Cargo.lock

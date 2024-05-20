@@ -1,0 +1,34 @@
+# Makefile.toml
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+[tasks.full]
+command = "cargo"
+args = ["build", "--all-features"]
+
+[tasks.binaries]
+command = "cargo"
+args = ["build", "--features=bin", "--bins"]
+condition = { files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/src/bin"] }
+
+[tasks.examples]
+command = "cargo"
+args = ["build", "--examples"]
+condition = { files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/examples"] }
+
+[tasks.test-unit]
+command = "cargo"
+args = ["test", "--lib"]
+
+[tasks.test-integration]
+command = "cargo"
+args = ["test", "--test", "*"]
+condition = { files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/tests"] }
+
+[tasks.test]
+clear = true
+dependencies = [
+	"test-unit",
+	"test-integration"
+]

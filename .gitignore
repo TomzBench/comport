@@ -11,6 +11,11 @@ docs/_build
 # cmake
 compile_commands.json
 
+# neon
+cargo.log
+js/*.node
+tsconfig.lib.tsbuildinfo
+
 .west
 
 /build
@@ -21,7 +26,7 @@ build/
 node_modules/
 
 # cargo
-/target
+/target  
 **/*/target
 **/*.rs.bk
 **/*/Cargo.lock

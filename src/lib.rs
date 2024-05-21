@@ -3,6 +3,9 @@
 #[cfg(test)]
 mod tests;
 
+#[cfg(feature = "node")]
+mod neon;
+
 // TODO remove pub when we add async io to com port
 pub mod channel;
 pub mod event;
@@ -11,6 +14,7 @@ mod hkey;
 mod wchar;
 mod wm;
 
+pub use hkey::{PortMeta, RegistryError};
 use std::{collections::HashMap, ffi::OsString, io};
 
 /// Listen for [`wm::WindowEvents`]

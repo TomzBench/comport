@@ -1,0 +1,3 @@
+packages:
+  - 'packages/binding'
+  - 'packages/comport'

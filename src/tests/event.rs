@@ -24,7 +24,7 @@ fn comport_test_event() {
     // Make sure we set event and are no longer pending anymore
     // NOTE we set the time delay to allow kernel some time to drive our future
     ev.set().unwrap();
-    std::thread::sleep(std::time::Duration::from_millis(1));
+    std::thread::sleep(std::time::Duration::from_millis(10));
     let poll = fut.poll_unpin(&mut cx);
     assert!(poll.is_ready());
 
@@ -39,7 +39,7 @@ fn comport_test_event() {
     // Make sure we set event and are no longer pending anymore
     // NOTE we set the time delay to allow kernel some time to drive our future
     ev.set().unwrap();
-    std::thread::sleep(std::time::Duration::from_millis(1));
+    std::thread::sleep(std::time::Duration::from_millis(10));
     let poll = fut.poll_unpin(&mut cx);
     assert!(poll.is_ready());
 }
@@ -60,7 +60,7 @@ fn comport_test_event_oneshot() {
     // Make sure we set event and are no longer pending anymore
     // NOTE we set the time delay to allow kernel some time to drive our future
     sender.set().unwrap();
-    std::thread::sleep(std::time::Duration::from_millis(1));
+    std::thread::sleep(std::time::Duration::from_millis(10));
     let poll = receiver.poll_unpin(&mut cx);
     assert!(poll.is_ready());
 }

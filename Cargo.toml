@@ -1,3 +1,12 @@
+[workspace]
+resolveer = "2"
+members = [
+	"packages/binding"
+]
+
+[workspace.dependencies.comport]
+path = "./"
+
 [package]
 name = "comport"
 version = "0.0.2"
@@ -6,6 +15,9 @@ keywords = ["Windows","Async", "Serialport"]
 description = "Windows first async serial port"
 edition = "2021"
 license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 futures = "0.3"
@@ -19,10 +31,14 @@ bitflags = "2.4"
 num-traits = "0.2"
 num-derive = "0.4"
 serde = { version = "1", optional = true }
+serde_json = { version = "1", optional = true }
 thiserror = "1"
 
 # log
 tracing = "0.1"
+
+# node binding
+neon = { version = "1", optional = true }
 
 # Windows dependencies
 [target.'cfg(windows)'.dependencies.windows-sys]
@@ -57,3 +73,4 @@ tokio-util = { version = "0.7", features = ["codec"] }
 [features]
 default = []
 serde = ["dep:serde"]
+node = ["dep:neon", "serde", "dep:serde_json"]

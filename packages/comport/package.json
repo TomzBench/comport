@@ -1,0 +1,39 @@
+{
+  "name": "@comport/comport",
+  "keywords": [],
+  "license": "ISC",
+  "main": "build/index.js",
+  "author": "",
+  "version": "0.5.2",
+  "dependencies": {
+    "@comport/binding": "workspace:*",
+    "rxjs": "^7.6.0",
+    "winston": "^3.8.2"
+  },
+  "description": "",
+  "devDependencies": {
+    "@types/jest": "~29.2",
+    "@types/node": "~18",
+    "@typescript-eslint/eslint-plugin": "~5.44",
+    "@typescript-eslint/parser": "~5.44",
+    "copyfiles": "^2.4.1",
+    "eslint": "~8.28",
+    "eslint-config-prettier": "~8.5",
+    "eslint-plugin-jest": "~27.1",
+    "jest": "~29.3",
+    "prettier": "~2.8",
+    "rimraf": "~3.0",
+    "ts-jest": "~29.0",
+    "tslib": "^2.4.1",
+    "tsutils": "~3.21",
+    "typescript": "~4.9"
+  },
+  "scripts": {
+    "build": "npm run build-tsc",
+    "build-tsc": "tsc -b tsconfig.lib.json && copyfiles -u 1 \"src/**/*.d.ts\" build",
+    "clean": "rimraf coverage build tmp tsconfig.lib.tsbuildinfo",
+    "test": "jest --coverage",
+    "watch": "tsc -w -b tsconfig.lib.json"
+  }
+}
+

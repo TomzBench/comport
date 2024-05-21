@@ -11,7 +11,9 @@ mod hkey;
 mod wchar;
 mod wm;
 
+pub use hkey::{PortMeta, RegistryError};
 use std::{collections::HashMap, ffi::OsString, io};
+pub use wm::{PlugEvent, WindowEvents};
 
 /// Listen for [`wm::WindowEvents`]
 pub fn listen<N>(name: N) -> Result<wm::WindowEvents, hkey::RegistryError>

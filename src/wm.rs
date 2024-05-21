@@ -474,7 +474,7 @@ unsafe fn device_notification_window_dispatcher(
                 error!(?name, ?error, "window dispatcher error");
                 break error;
             }
-            _ if msg.message == WM_CLOSE as _ => {
+            _ if msg.message == WM_CLOSE => {
                 trace!(?name, "window dispatcher received wm_close");
                 TranslateMessage(&msg as *const _);
                 DispatchMessageW(&msg as *const _);

@@ -37,9 +37,6 @@ thiserror = "1"
 # log
 tracing = "0.1"
 
-# node binding
-neon = { version = "1", optional = true }
-
 # Windows dependencies
 [target.'cfg(windows)'.dependencies.windows-sys]
 version = "0.52"

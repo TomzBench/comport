@@ -3,9 +3,6 @@
 #[cfg(test)]
 mod tests;
 
-#[cfg(feature = "node")]
-mod neon;
-
 // TODO remove pub when we add async io to com port
 pub mod channel;
 pub mod event;

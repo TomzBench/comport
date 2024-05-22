@@ -26,12 +26,6 @@ command = "cargo"
 args = ["test", "--test", "*"]
 condition = { files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/tests"] }
 
-[tasks.napi-build]
-condition = { files_exist = ["${CARGO_MAKE_WORKING_DIRECTORY}/package.json"] }
-script = '''
-	cargo build --features node
-'''
-
 [tasks.test]
 clear = true
 dependencies = [

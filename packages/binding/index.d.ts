@@ -10,6 +10,16 @@ export interface PortMeta {
 export function scan(): Record<string, PortMeta>
 export function rescan(name: string): void
 export function listen(name: string, callback: (err:null | Error, event: any) => void): AbortHandle
+/**
+ *      - Copy listen() implementation but except a Vec<(String,String)> of Product/Vendor ids and
+ *        emit a Track event which includes a Unplug promise
+ */
+export function track(name: string, ids: Array<[string, string]>, callback: (err: null | Error, event: any) => void): AbortHandle
+export class TrackedPort {
+  port: string
+  meta: PortMeta
+  unplugged(): Promise<void>
+}
 export class AbortHandle {
   abort(): void
 }

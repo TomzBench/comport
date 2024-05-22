@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (tx, mut rx) = tokio::sync::mpsc::channel(128);
 
     // Create a stream to listen for events
-    let stream = comport::listen("MYWINDOW")?.track(vec![("2FE3", "0100")])?;
+    let stream = comport::listen("COMPORT_DEMO")?.track(vec![("2FE3", "0100")])?;
     let jh: JoinHandle<Result<(), TrackingError>> = tokio::spawn(async move {
         let mut pinned = pin!(stream);
         let mut count = 0usize;
@@ -45,15 +45,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     // Scan the same port 5 times (1 on startup + 4 extras)
-    info!("scanning MYWINDOW");
+    info!("scanning COMPORT_DEMO");
     std::thread::sleep(std::time::Duration::from_millis(100));
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
-    comport::rescan("MYWINDOW")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
+    comport::rescan("COMPORT_DEMO")?;
     while let Some(tracked) = rx.recv().await {
         info!(?tracked, "received scan");
     }

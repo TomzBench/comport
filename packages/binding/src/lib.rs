@@ -2,8 +2,11 @@
 
 #[macro_use]
 extern crate napi_derive;
-use comport::{event::Receiver as Abort, event::Sender as AbortSet};
-use futures::StreamExt;
+use comport::{
+    event::{Receiver as Abort, Sender as AbortSet},
+    prelude::*,
+};
+use futures::{future::Shared, FutureExt, StreamExt};
 use napi::{
     bindgen_prelude::ObjectFinalize,
     threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode},
@@ -11,6 +14,34 @@ use napi::{
 };
 use serde::Serialize;
 use std::{collections::HashMap, pin::pin, thread::JoinHandle};
+
+#[napi]
+pub struct TrackedPort {
+    pub port: String,
+    pub meta: PortMeta,
+    unplugged: Shared<Unplugged>,
+}
+
+#[napi]
+impl TrackedPort {
+    #[napi]
+    pub async fn unplugged(&self) -> Result<()> {
+        self.unplugged
+            .clone()
+            .await
+            .map_err(|e| Error::from_reason(e.to_string()))
+    }
+}
+
+impl From<comport::prelude::TrackedPort> for TrackedPort {
+    fn from(value: comport::prelude::TrackedPort) -> Self {
+        TrackedPort {
+            port: value.port.to_str().unwrap_or("unknown").to_string(),
+            meta: value.ids.into(),
+            unplugged: value.unplugged.shared(),
+        }
+    }
+}
 
 #[derive(Serialize, Debug)]
 #[serde(tag = "type")]
@@ -101,9 +132,9 @@ pub fn rescan(name: String) -> Result<()> {
 pub fn listen(name: String, callback: JsFunction) -> Result<AbortHandle> {
     // Create a callback to emit events into javascript land
     let tsfn: ThreadsafeFunction<PlugEvent> = callback.create_threadsafe_function(0, |cx| {
-        Ok(serde_json::to_value(cx.value)
+        serde_json::to_value(cx.value)
             .map(|result| vec![result])
-            .map_err(|e| Error::from_reason(e.to_string()))?)
+            .map_err(|e| Error::from_reason(e.to_string()))
     })?;
 
     // Get an abort handle to return to the caller
@@ -122,6 +153,52 @@ pub fn listen(name: String, callback: JsFunction) -> Result<AbortHandle> {
                 let _status = match ev {
                     Ok(ev) => tsfn.call(
                         Ok(PlugEvent::from(ev)),
+                        ThreadsafeFunctionCallMode::Blocking,
+                    ),
+                    Err(e) => tsfn.call(
+                        Err(Error::from_reason(e.to_string())),
+                        ThreadsafeFunctionCallMode::Blocking,
+                    ),
+                };
+            }
+        });
+    });
+    Ok(AbortHandle {
+        join_handle: Some(jh),
+        abort: Some(abort_set),
+    })
+}
+
+///      - Copy listen() implementation but except a Vec<(String,String)> of Product/Vendor ids and
+///        emit a Track event which includes a Unplug promise
+#[napi]
+pub fn track(
+    name: String,
+    ids: Vec<(String, String)>,
+    #[napi(ts_arg_type = "(err: null | Error, event: any) => void")] callback: JsFunction,
+) -> Result<AbortHandle> {
+    // Create a callback to emit events into javascript land
+    let tsfn: ThreadsafeFunction<TrackedPort> =
+        callback.create_threadsafe_function(0, |cx| Ok(vec![cx.value]))?;
+
+    // Get an abort handle to return to the caller
+    let (abort_set, abort) = abort_channel()?;
+
+    // Create an event stream
+    let stream = comport::listen(name)
+        .map_err(|e| Error::from_reason(e.to_string()))?
+        .take_until(abort)
+        .track(ids)
+        .map_err(|e| Error::from_reason(e.to_string()))?;
+
+    // Spawn a thread to listen for events
+    let jh = std::thread::spawn(move || {
+        futures::executor::block_on(async {
+            let mut pinned = pin!(stream);
+            while let Some(ev) = pinned.next().await {
+                let _status = match ev {
+                    Ok(ev) => tsfn.call(
+                        Ok(TrackedPort::from(ev)),
                         ThreadsafeFunctionCallMode::Blocking,
                     ),
                     Err(e) => tsfn.call(

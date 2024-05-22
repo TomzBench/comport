@@ -1,6 +1,6 @@
 {
   "name": "@comport/binding",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -15,7 +15,8 @@
   "license": "MIT",
   "devDependencies": {
     "@napi-rs/cli": "^2.18.3",
-    "ava": "^6.0.1"
+    "ava": "^6.0.1",
+    "copyfiles": "^2.4.1"
   },
   "ava": {
     "timeout": "3m"
@@ -25,16 +26,17 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
+    "artifacts:local": "copyfiles ./binding.win32-x64-msvc.node ./npm/win32-x64-msvc",
     "build-napi": "napi build --platform --release",
     "build": "npm run build-napi",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
-    "clean": "rimraf *.node ./index.d.ts tsconfig.lib.tsbuildinfo",
+    "clean": "rimraf **/*.node ./index.d.ts tsconfig.lib.tsbuildinfo",
     "test": "ava",
     "universal": "napi universal",
     "version": "napi version"
   },
   "optionalDependencies": {
-    "@comport/binding-win32-x64-msvc": "0.0.0"
+    "@comport/binding-win32-x64-msvc": "0.0.2"
   }
 }

@@ -1,10 +1,10 @@
 {
-  "name": "@comport/comport",
+  "name": "@comport/core",
+  "version": "0.0.2",
   "keywords": [],
   "license": "ISC",
   "main": "build/index.js",
   "author": "",
-  "version": "0.5.2",
   "dependencies": {
     "@comport/binding": "workspace:*",
     "rxjs": "^7.6.0",
@@ -29,8 +29,8 @@
     "typescript": "~4.9"
   },
   "scripts": {
-    "build": "npm run build-tsc",
-    "build-tsc": "tsc -b tsconfig.lib.json && copyfiles -u 1 \"src/**/*.d.ts\" build",
+    "build": "npm run build:tsc",
+    "build:tsc": "tsc -b tsconfig.lib.json && copyfiles -u 1 \"src/**/*.d.ts\" build",
     "clean": "rimraf coverage build tmp tsconfig.lib.tsbuildinfo",
     "test": "jest --coverage",
     "watch": "tsc -w -b tsconfig.lib.json"

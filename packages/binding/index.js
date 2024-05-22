@@ -310,7 +310,9 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { scan, rescan } = nativeBinding
+const { AbortHandle, scan, rescan, listen } = nativeBinding
 
+module.exports.AbortHandle = AbortHandle
 module.exports.scan = scan
 module.exports.rescan = rescan
+module.exports.listen = listen

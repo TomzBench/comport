@@ -1,3 +1,4 @@
 packages:
   - 'packages/binding'
   - 'packages/comport'
+  - 'packages/demo'

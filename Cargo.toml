@@ -1,12 +1,3 @@
-[workspace]
-resolveer = "2"
-members = [
-	"packages/binding"
-]
-
-[workspace.dependencies.comport]
-path = "./"
-
 [package]
 name = "comport"
 version = "0.0.2"

@@ -3,6 +3,11 @@ import type { PortMeta } from "@comport/binding";
 import { Subject, Observable, finalize } from "rxjs";
 
 /*
+ * Re-exports
+ */
+export { TrackedPort } from "@comport/binding";
+
+/*
  * Event
  */
 export type EventKind = "Plug" | "Unplug";

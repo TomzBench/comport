@@ -6,7 +6,10 @@ use comport::{
     event::{Receiver as Abort, Sender as AbortSet},
     prelude::*,
 };
-use futures::{future::Shared, FutureExt, StreamExt};
+use futures::{
+    future::{Either, Shared},
+    FutureExt, StreamExt,
+};
 use napi::{
     bindgen_prelude::ObjectFinalize,
     threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode},
@@ -20,25 +23,31 @@ pub struct TrackedPort {
     pub port: String,
     pub meta: PortMeta,
     unplugged: Shared<Unplugged>,
+    abort: Shared<Abort>,
 }
 
 #[napi]
 impl TrackedPort {
     #[napi]
     pub async fn unplugged(&self) -> Result<()> {
-        self.unplugged
-            .clone()
-            .await
-            .map_err(|e| Error::from_reason(e.to_string()))
+        let unplugged = self.unplugged.clone();
+        let abort = self.abort.clone();
+        match futures::future::select(unplugged, abort).await {
+            Either::Left((Ok(_), _)) => Ok(()),
+            Either::Left((Err(err), _)) => Err(Error::from_reason(err.to_string())),
+            Either::Right((Ok(_), _)) => Err(Error::from_reason("unplugged aborted".to_string())),
+            Either::Right((Err(err), _)) => Err(Error::from_reason(err.to_string())),
+        }
     }
 }
 
-impl From<comport::prelude::TrackedPort> for TrackedPort {
-    fn from(value: comport::prelude::TrackedPort) -> Self {
+impl TrackedPort {
+    fn new(tracked: comport::prelude::TrackedPort, abort: Shared<Abort>) -> TrackedPort {
         TrackedPort {
-            port: value.port.to_str().unwrap_or("unknown").to_string(),
-            meta: value.ids.into(),
-            unplugged: value.unplugged.shared(),
+            port: tracked.port.to_str().unwrap_or("unknown").to_string(),
+            meta: tracked.ids.into(),
+            unplugged: tracked.unplugged.shared(),
+            abort,
         }
     }
 }
@@ -182,12 +191,15 @@ pub fn track(
         callback.create_threadsafe_function(0, |cx| Ok(vec![cx.value]))?;
 
     // Get an abort handle to return to the caller
+    // TODO trackedPort needs a clone of our abort signal
+    //      the future will race unplug vs abort
     let (abort_set, abort) = abort_channel()?;
+    let abort = abort.shared();
 
     // Create an event stream
     let stream = comport::listen(name)
         .map_err(|e| Error::from_reason(e.to_string()))?
-        .take_until(abort)
+        .take_until(abort.clone())
         .track(ids)
         .map_err(|e| Error::from_reason(e.to_string()))?;
 
@@ -198,7 +210,7 @@ pub fn track(
             while let Some(ev) = pinned.next().await {
                 let _status = match ev {
                     Ok(ev) => tsfn.call(
-                        Ok(TrackedPort::from(ev)),
+                        Ok(TrackedPort::new(ev, abort.clone())),
                         ThreadsafeFunctionCallMode::Blocking,
                     ),
                     Err(e) => tsfn.call(

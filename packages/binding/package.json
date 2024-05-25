@@ -1,6 +1,6 @@
 {
   "name": "@comport/binding",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -37,6 +37,6 @@
     "version": "napi version"
   },
   "optionalDependencies": {
-    "@comport/binding-win32-x64-msvc": "0.0.3"
+    "@comport/binding-win32-x64-msvc": "0.0.5"
   }
 }

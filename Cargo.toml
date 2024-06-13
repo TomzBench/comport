@@ -1,6 +1,6 @@
 [package]
 name = "comport"
-version = "0.0.2"
+version = "0.0.6"
 authors = ["Thomas Chiantia <thomas.chiantia@gmail.com>"]
 keywords = ["Windows","Async", "Serialport"]
 description = "Windows first async serial port"
@@ -16,12 +16,13 @@ bytes = "1"
 pin-project-lite = "0.2"
 crossbeam = "0.8"
 parking_lot = "0.12"
+regex = "1"
 
 # other
 bitflags = "2.4"
 num-traits = "0.2"
 num-derive = "0.4"
-serde = { version = "1", optional = true }
+serde = { version = "1", optional = true, features = ["derive"] }
 serde_json = { version = "1", optional = true }
 thiserror = "1"
 

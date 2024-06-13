@@ -1,6 +1,7 @@
 //! hkey
 use super::wchar::from_wide;
-use std::{borrow::Cow, collections::HashMap, error, ffi::OsString, fmt, io, num::ParseIntError};
+use regex::Regex;
+use std::{borrow::Cow, collections::HashMap, error, ffi::OsString, fmt, io};
 use tracing::trace;
 use windows_sys::Win32::{Foundation::ERROR_SUCCESS, System::Registry::*};
 
@@ -275,71 +276,41 @@ impl Iterator for HkeyValueIter {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct PortMeta {
-    vid: u32,
-    pid: u32,
+    pub vendor: String,
+    pub product: String,
 }
 
 impl PortMeta {
-    pub fn vid(&self) -> String {
-        format!("{:0>4X}", self.vid)
-    }
-
-    pub fn pid(&self) -> String {
-        format!("{:0>4X}", self.pid)
+    pub fn parse_registry(s: &str) -> Option<PortMeta> {
+        let re = Regex::new("(vid_|pid_).{4}").unwrap();
+        let mut caps: Vec<String> = re
+            .find_iter(s)
+            .map(|m| m.as_str()[4..].to_string())
+            .collect();
+        Some(PortMeta {
+            product: caps.pop()?,
+            vendor: caps.pop()?,
+        })
     }
 
     pub fn matches(&self, vid: &str, pid: &str) -> bool {
-        vid == self.vid() && pid == self.pid()
+        vid == self.vendor.to_lowercase() && pid == self.product.to_lowercase()
     }
 }
 
-impl fmt::Debug for PortMeta {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("UsbRegistryDevice")
-            .field("vid", &self.vid())
-            .field("pid", &self.pid())
-            .finish()
-    }
-}
-
-impl TryFrom<RegistryData> for PortMeta {
-    type Error = RegistryError;
-    fn try_from(value: RegistryData) -> Result<Self, Self::Error> {
-        let os_str = value.try_into_os_string()?;
-        let data = os_str
-            .to_str()
-            .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "unsupported registry value"))?;
-        Self::try_from((&data[12..16], &data[21..25]))
-            .map_err(|e| RegistryError::InvalidRegistryData(e, os_str))
-    }
-}
-
-impl<'v, 'p, V, P> TryFrom<(V, P)> for PortMeta
+impl<'v, 'p, V, P> From<(V, P)> for PortMeta
 where
     V: Into<Cow<'v, str>>,
     P: Into<Cow<'p, str>>,
 {
-    type Error = ParseIntError;
-    fn try_from((vid, pid): (V, P)) -> Result<Self, Self::Error> {
-        let vid = u32::from_str_radix(&vid.into(), 16)?;
-        let pid = u32::from_str_radix(&pid.into(), 16)?;
-        Ok(Self { vid, pid })
-    }
-}
-
-#[cfg(feature = "serde")]
-impl serde::Serialize for PortMeta {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeStruct;
-        let mut state = serializer.serialize_struct("PortMeta", 2)?;
-        state.serialize_field("vid", &self.vid())?;
-        state.serialize_field("pid", &self.pid())?;
-        state.end()
+    fn from((vid, pid): (V, P)) -> Self {
+        PortMeta {
+            vendor: vid.into().to_string().to_lowercase(),
+            product: pid.into().to_string().to_lowercase(),
+        }
     }
 }
 
@@ -349,8 +320,8 @@ pub enum RegistryError {
     UnexpectedRegistryData(#[from] UnexpectedRegistryData),
     #[error("io error => {0}")]
     Io(#[from] io::Error),
-    #[error("invalid registry data {0:?} {1:?}")]
-    InvalidRegistryData(ParseIntError, OsString),
+    #[error("unable to parse registry data {0:?}")]
+    UnableToParseRegistryData(OsString),
     #[error("com port {0:?} missing from registry")]
     ComPortMissingFromRegistry(OsString),
 }
@@ -403,7 +374,10 @@ pub fn scan() -> Result<HashMap<OsString, PortMeta>, RegistryError> {
     .into_values()?
     .map(|value| {
         let (port, data) = value?;
-        PortMeta::try_from(data).map(|vidpid| (port, vidpid))
+        let os_str = data.try_into_os_string()?;
+        PortMeta::parse_registry(&os_str.to_string_lossy())
+            .ok_or_else(|| RegistryError::UnableToParseRegistryData(os_str))
+            .map(|meta| (port, meta))
     })
     .collect::<Result<HashMap<OsString, PortMeta>, RegistryError>>()?;
 

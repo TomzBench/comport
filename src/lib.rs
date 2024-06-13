@@ -149,7 +149,7 @@ pub mod prelude {
                         Poll::Ready(Some(Ok(PlugEvent::Arrival(port, id)))) => {
                             match ids.iter().find(|test| **test == id) {
                                 None => debug!(?port, ?id, "ignoring com device"),
-                                Some(id) => match TrackedPort::track(port.clone(), *id) {
+                                Some(id) => match TrackedPort::track(port.clone(), id.clone()) {
                                     Err(e) => break Poll::Ready(Some(Err(e.into()))),
                                     Ok((sender, tracked)) => {
                                         cache.insert(port.clone(), sender);
@@ -183,10 +183,7 @@ pub mod prelude {
             P: Into<Cow<'p, str>>,
             Self: Sized,
         {
-            let collection = ids
-                .into_iter()
-                .map(PortMeta::try_from)
-                .collect::<Result<Vec<PortMeta>, ParseIntError>>()?;
+            let collection = ids.into_iter().map(PortMeta::from).collect();
             Ok(Tracking::Streaming {
                 inner: self,
                 ids: collection,

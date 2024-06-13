@@ -83,8 +83,8 @@ pub struct PortMeta {
 impl From<comport::PortMeta> for PortMeta {
     fn from(value: comport::PortMeta) -> Self {
         PortMeta {
-            vendor: value.vid(),
-            product: value.pid(),
+            vendor: value.vendor,
+            product: value.product,
         }
     }
 }

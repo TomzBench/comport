@@ -145,7 +145,10 @@ pub mod prelude {
                             self.project_replace(Self::Complete);
                             break Poll::Ready(None);
                         }
-                        Poll::Ready(Some(Err(e))) => break Poll::Ready(Some(Err(e.into()))),
+                        Poll::Ready(Some(Err(e))) => {
+                            let reason = e.to_string();
+                            warn!(reason, "skipping scan result");
+                        }
                         Poll::Ready(Some(Ok(PlugEvent::Arrival(port, id)))) => {
                             match ids.iter().find(|test| **test == id) {
                                 None => debug!(?port, ?id, "ignoring com device"),

@@ -1,6 +1,6 @@
 {
   "name": "@comport/binding",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -28,7 +28,7 @@
     "artifacts": "napi artifacts",
     "artifacts:local": "copyfiles ./binding.win32-x64-msvc.node ./npm/win32-x64-msvc",
     "build-napi": "napi build --platform --release",
-    "build": "npm run build-napi",
+    "build": "npm run build-napi && npm run artifacts:local",
     "build:debug": "napi build --platform",
     "prepublishOnly": "napi prepublish -t npm",
     "clean": "rimraf **/*.node ./index.d.ts tsconfig.lib.tsbuildinfo",
@@ -37,6 +37,6 @@
     "version": "napi version"
   },
   "optionalDependencies": {
-    "@comport/binding-win32-x64-msvc": "0.0.7"
+    "@comport/binding-win32-x64-msvc": "0.0.8"
   }
 }

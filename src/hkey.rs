@@ -2,7 +2,7 @@
 use super::wchar::from_wide;
 use regex::Regex;
 use std::{borrow::Cow, collections::HashMap, error, ffi::OsString, fmt, io};
-use tracing::trace;
+use tracing::{trace, warn};
 use windows_sys::Win32::{Foundation::ERROR_SUCCESS, System::Registry::*};
 
 #[derive(Debug)]
@@ -378,6 +378,13 @@ pub fn scan() -> Result<HashMap<OsString, PortMeta>, RegistryError> {
         PortMeta::parse_registry(&os_str.to_string_lossy())
             .ok_or_else(|| RegistryError::UnableToParseRegistryData(os_str))
             .map(|meta| (port, meta))
+    })
+    .filter_map(|result| match result {
+        Err(RegistryError::UnableToParseRegistryData(pnp)) => {
+            warn!(pnp=?pnp, "unable to parse registry data");
+            None
+        }
+        result => Some(result),
     })
     .collect::<Result<HashMap<OsString, PortMeta>, RegistryError>>()?;
 

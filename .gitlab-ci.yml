@@ -59,6 +59,8 @@ pnpm_publish:
   tags: 
     - windows
   script:
+    - echo "@npm:registry=https://registry.npmjs.org" > .npmrc
+    - echo "//registry.npmjs.org/:_authToken=$Env:NPM_TOKEN" >> .npmrc
     - pnpm --filter binding publish --access public
     - pnpm --filter core publish --access public
   rules:

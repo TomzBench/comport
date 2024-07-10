@@ -37,6 +37,6 @@
     "version": "napi version"
   },
   "optionalDependencies": {
-    "@comport/binding-win32-x64-msvc": "0.0.10"
+    "@comport/binding-win32-x64-msvc": "0.0.11"
   }
 }

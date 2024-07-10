@@ -16,7 +16,7 @@ use std::{collections::HashMap, ffi::OsString, io};
 pub use wm::{PlugEvent, WindowEvents};
 
 /// Listen for [`wm::WindowEvents`]
-pub fn listen<N>(name: N) -> Result<wm::WindowEvents, hkey::RegistryError>
+pub fn listen<N>(name: N) -> wm::WindowEvents
 where
     N: Into<OsString> + Send + Sync + 'static,
 {

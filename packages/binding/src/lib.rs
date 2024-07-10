@@ -150,9 +150,7 @@ pub fn listen(name: String, callback: JsFunction) -> Result<AbortHandle> {
     let (abort_set, abort) = abort_channel()?;
 
     // Create an event stream
-    let stream = comport::listen(name)
-        .map_err(|e| Error::from_reason(e.to_string()))?
-        .take_until(abort);
+    let stream = comport::listen(name).take_until(abort);
 
     // Spawn a thread to listen for events
     let jh = std::thread::spawn(move || {
@@ -198,7 +196,6 @@ pub fn track(
 
     // Create an event stream
     let stream = comport::listen(name)
-        .map_err(|e| Error::from_reason(e.to_string()))?
         .take_until(abort.clone())
         .track(ids)
         .map_err(|e| Error::from_reason(e.to_string()))?;

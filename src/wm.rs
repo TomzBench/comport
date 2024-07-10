@@ -125,7 +125,7 @@ impl Registry {
         self
     }
 
-    pub fn spawn<N>(self, n: N) -> ScanResult<WindowEvents>
+    pub fn spawn<N>(self, n: N) -> WindowEvents
     where
         N: Into<OsString> + Send + Sync + 'static,
     {
@@ -141,11 +141,11 @@ impl Registry {
         let join_handle = std::thread::spawn(move || unsafe {
             device_notification_window_dispatcher(name, self, Arc::into_raw(theirs) as _)
         });
-        Ok(WindowEvents {
+        WindowEvents {
             window,
             context: ours,
             join_handle: Some(join_handle),
-        })
+        }
     }
 
     /// Collect the GUID's and register them for a window handle. NOTE that this method is private

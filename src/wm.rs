@@ -13,6 +13,7 @@ use futures::Stream;
 use parking_lot::Mutex;
 use std::{
     cell::OnceCell,
+    collections::HashMap,
     ffi::{c_void, OsString},
     io,
     os::windows::io::{AsRawHandle, RawHandle},
@@ -130,7 +131,8 @@ impl Registry {
     {
         let name: OsString = n.into();
         let window = name.clone();
-        let devices = self::scan()?
+        let devices = self::scan()
+            .unwrap_or_else(|_| HashMap::new())
             .into_iter()
             .map(|(port, meta)| PlugEvent::Arrival(port, meta))
             .collect();

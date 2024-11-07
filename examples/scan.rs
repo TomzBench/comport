@@ -5,6 +5,7 @@ use std::pin::pin;
 use tokio::task::JoinHandle;
 use tracing::{error, info};
 use tracing_subscriber::{filter::LevelFilter, fmt, layer::SubscriberExt, prelude::*};
+use foo;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

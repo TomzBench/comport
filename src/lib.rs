@@ -3,6 +3,8 @@
 #[cfg(test)]
 mod tests;
 
+use foo;
+
 // TODO remove pub when we add async io to com port
 pub mod channel;
 pub mod event;

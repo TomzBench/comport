@@ -58,6 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         info!(?tracked, "received scan");
     }
 
+    sdfdsf;
     info!("demo over");
     jh.await??;
     Ok(())

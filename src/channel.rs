@@ -18,7 +18,7 @@ pub trait WakeHandle: AsRawHandle {
     fn wake(&self) -> io::Result<()> {
         let result = unsafe { CancelIoEx(self.as_raw_handle() as _, std::ptr::null()) };
         match result {
-            FALSE => Err(io::Error::last_os_error().into()),
+            FALSE => Err(io::Error::last_os_error()),
             _ => Ok(()),
         }
     }
@@ -267,11 +267,11 @@ impl AsyncRead for Reader {
                     Some(Ok(next)) => {
                         let remaining = buf.len() - idx;
                         if next.len() <= remaining {
-                            buf[idx..idx + next.len()].copy_from_slice(&next);
-                            idx = idx + next.len();
+                            buf[idx..idx + next.len()].copy_from_slice(next);
+                            idx += next.len();
                             next.advance(next.len());
                             // loop around for next queue item
-                            if next.len() == 0 {
+                            if next.is_empty() {
                                 current.take();
                             }
                         } else {

@@ -9,8 +9,8 @@ importers:
   packages/binding:
     optionalDependencies:
       '@comport/binding-win32-x64-msvc':
-        specifier: 0.0.8
-        version: 0.0.8
+        specifier: 0.0.11
+        version: 0.0.11
     devDependencies:
       '@napi-rs/cli':
         specifier: ^2.18.3
@@ -425,8 +425,8 @@ packages:
     engines: {node: '>=0.1.90'}
     dev: false
 
-  /@comport/binding-win32-x64-msvc@0.0.8:
-    resolution: {integrity: sha512-YSwm/30HF9nKYbnjErQ8OVxHI2RA3IgEQdkJ9HTogTacRwGuuBOgL0xHYfeeejLQlrYonevCBux0w5hDZDPx5Q==}
+  /@comport/binding-win32-x64-msvc@0.0.11:
+    resolution: {integrity: sha512-3RyL8qrULsvpiMn757CY7sHyM8AJ/wVdXFWbQ36Xbyga+JsrYfSfaRimHZcJMvtgS5li8DmLbcYgG1YHSCYudw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]

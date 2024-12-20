@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (tx, mut rx) = tokio::sync::mpsc::channel(128);
 
     // Create a stream to listen for events
-    let stream = comport::listen("comport demo")?
+    let stream = comport::listen("comport demo")
         .track(vec![("2FE3", "0100")])?
         .take_until(abort);
 

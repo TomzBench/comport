@@ -19,7 +19,6 @@ tsconfig.lib.tsbuildinfo
 .west
 
 /build
-/.vscode
 *.DS_Store
 __pycache__
 build/

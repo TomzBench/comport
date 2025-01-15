@@ -1,0 +1,32 @@
+{
+  "rust-analyzer": {
+    "diagnostics": {
+      "disabled": "unlinked-file",
+      "experimental": {
+        "enable": true
+      }
+    },
+    "cargo": {
+      "features": "all",
+      "buildScripts": { "enable": true }
+    },
+    "check": {
+      "features": "all",
+      "overrideCommand": [
+        "cargo",
+        "check",
+        "+nightly",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--tests",
+        "--examples",
+        "--benches",
+        "--message-format=json"
+      ]
+    },
+    "procMacro": { "enable": true },
+    "linkedProjects": ["./Cargo.toml", "./packages/binding/Cargo.toml"]
+  }
+}

@@ -63,3 +63,9 @@ tokio-util = { version = "0.7", features = ["codec"] }
 default = []
 serde = ["dep:serde"]
 node = ["dep:serde_json"]
+
+[[example]]
+name = "scan"
+
+[[example]]
+name = "track"
